@@ -62,8 +62,12 @@ app.post('/api/persons', (req, res) => {
   const body = req.body
 
   if(!body.name || !body.number) {
-    return res.send(400).json({ 
+    return res.status(400).send({ 
       error: 'person info missing' 
+    })
+  } else if(persons.some(person => person.name === body.name)){
+    return res.status(400).send({ 
+      error: 'name must be unique' 
     })
   }
 
