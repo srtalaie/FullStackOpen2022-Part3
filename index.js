@@ -24,24 +24,7 @@ let persons = [
       "name": "Mary Poppendieck", 
       "number": "39-23-6423122"
     },
-    { 
-      "id": 5,
-      "name": "t", 
-      "number": "39-23-6423122"
-    },
-    { 
-      "id": 6,
-      "name": "v", 
-      "number": "39-23-6423122"
-    }
 ]
-
-const generateId = () => {
-    const maxId = persons.length > 0
-      ? Math.max(...persons.map(person => person.id))
-      : 0
-    return maxId + 1
-  }
 
 app.get('/api/persons', (req, res) => {
     res.json(persons)
@@ -73,6 +56,27 @@ app.delete('/api/persons/:id', (req, res) => {
     persons = persons.filter(person => person.id !== id)
 
     res.status(204).end()
+})
+
+app.post('/api/persons', (req, res) => {
+  const body = req.body
+
+  if(!body.name || !body.number) {
+    return res.send(400).json({ 
+      error: 'person info missing' 
+    })
+  }
+
+  const person = {
+    id: Math.floor(Math.random() * (1000000000000 - 6 + 1) + 6),
+    name: body.name,
+    number: body.number
+
+  }
+
+  persons = persons.concat(person)
+
+  res.json(person)
 })
 
 const PORT = 3001
