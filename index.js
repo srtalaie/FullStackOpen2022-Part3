@@ -11,6 +11,7 @@ morgan.token('body', req => {
 app.use(cors());
 app.options('*', cors());  // enable pre-flight
 app.use(express.json())
+app.use(express.static('build'))
 app.use(morgan('tiny'))
 app.use(morgan(':method :url :body'))
 
