@@ -18,63 +18,51 @@ app.use(express.static('build'))
 app.use(morgan('tiny'))
 app.use(morgan(':method :url :body'))
 
-// let persons = [
-//     { 
-//       "id": 1,
-//       "name": "Arto Hellas", 
-//       "number": "040-123456"
-//     },
-//     { 
-//       "id": 2,
-//       "name": "Ada Lovelace", 
-//       "number": "39-44-5323523"
-//     },
-//     { 
-//       "id": 3,
-//       "name": "Dan Abramov", 
-//       "number": "12-43-234345"
-//     },
-//     { 
-//       "id": 4,
-//       "name": "Mary Poppendieck", 
-//       "number": "39-23-6423122"
-//     },
-// ]
+//Routes
+app.get('/info', (req, res) => {
+  let entries
+  let date = new Date()
+  Person.find({})
+    .then(results => {
+      entries = results.length
+      res.send(
+        `<p>Phone book has info for ${entries} people</p>
+        <p>${date}</p>
+    `)
+    })
+})
 
 app.get('/api/persons', (req, res) => {
     Person.find({})
-      .then(results => {
-        res.json(results)
+      .then(people => {
+        res.json(people)
       })
       .catch(err => err.message)
 })
 
-app.get('/info', (req, res) => {
-    let entries = persons.length
-    let date = new Date()
-    res.send(
-        `<p>Phone book has info for ${entries} people</p>
-        <p>${date}</p>
-    `)
-})
-
 app.get('/api/persons/:id', (req, res) => {
-    const id = Number(req.params.id)
-    const person = persons.find(person => person.id === id)
+    const id = req.params.id
 
-    if(person) {
+    Person.find({ _id: id })
+      .then(person => {
         res.send(person)
-    } else {
+      })
+      .catch(err => {
+        console.log(err)
         res.status(404).end()
-    }
+      })
 })
 
 app.delete('/api/persons/:id', (req, res) => {
-    const id = Number(req.params.id)
-    console.log(id)
-    persons = persons.filter(person => person.id !== id)
-
-    res.status(204).end()
+    const id = req.params.id
+    Person.findOneAndDelete({ _id: id })
+      .then(result => {
+        res.status(204).end()
+      })
+      .catch(err => {
+        console.log(err)
+        res.status(404).end()
+      })
 })
 
 app.post('/api/persons', (req, res) => {
