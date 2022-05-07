@@ -72,22 +72,22 @@ app.post('/api/persons', (req, res) => {
     return res.status(400).send({ 
       error: 'person info missing' 
     })
-  } else if(persons.some(person => person.name === body.name)){
-    return res.status(400).send({ 
-      error: 'name must be unique' 
-    })
   }
 
   const person = {
-    id: Math.floor(Math.random() * (1000000000000 - 6 + 1) + 6),
     name: body.name,
     number: body.number
 
   }
 
-  persons = persons.concat(person)
-
-  res.json(person)
+  Person.create(person)
+    .then(results => {
+      res.send(results)
+    })
+    .catch(err => {
+      console.log(err)
+      res.status(404).end()
+    })
 })
 
 const PORT = process.env.PORT || 3001
