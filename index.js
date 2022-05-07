@@ -57,6 +57,7 @@ app.delete('/api/persons/:id', (req, res) => {
     const id = req.params.id
     Person.findOneAndDelete({ _id: id })
       .then(result => {
+        res.send(result)
         res.status(204).end()
       })
       .catch(err => {
