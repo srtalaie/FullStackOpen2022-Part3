@@ -19,7 +19,7 @@ app.use(morgan('tiny'))
 app.use(morgan(':method :url :body'))
 
 //Routes
-app.get('/info', (req, res) => {
+app.get('/info', (req, res, next) => {
   let entries
   let date = new Date()
   Person.find({})
@@ -30,43 +30,51 @@ app.get('/info', (req, res) => {
         <p>${date}</p>
     `)
     })
+    .catch(error => next(error))
 })
 
-app.get('/api/persons', (req, res) => {
+app.get('/api/persons', (req, res, next) => {
     Person.find({})
       .then(people => {
-        res.json(people)
+        if(people) {
+          res.json(people)
+        } else {
+          res.status(404).end()
+        }
       })
-      .catch(err => err.message)
+      .catch(error => next(error))
 })
 
-app.get('/api/persons/:id', (req, res) => {
+app.get('/api/persons/:id', (req, res, next) => {
     const id = req.params.id
 
     Person.find({ _id: id })
       .then(person => {
-        res.send(person)
+        if(person) {
+          res.send(person)
+        } else {
+          res.status(404).end()
+        }
       })
-      .catch(err => {
-        console.log(err)
-        res.status(404).end()
-      })
+      .catch(error => next(error))
 })
 
-app.delete('/api/persons/:id', (req, res) => {
+app.delete('/api/persons/:id', (req, res, next) => {
     const id = req.params.id
+
     Person.findOneAndDelete({ _id: id })
       .then(result => {
-        res.send(result)
-        res.status(204).end()
+        if(result) {
+          res.send(result)
+          res.status(204).end()
+        } else {
+          res.status(404).end()
+        }
       })
-      .catch(err => {
-        console.log(err)
-        res.status(404).end()
-      })
+      .catch(error => next(error))
 })
 
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', (req, res, next) => {
   const body = req.body
 
   if(!body.name || !body.number) {
@@ -83,13 +91,21 @@ app.post('/api/persons', (req, res) => {
 
   Person.create(person)
     .then(results => {
-      res.send(results)
+      if(results) {
+        res.send(results)
+      } else {
+        res.status(404).end()
+      }
+
     })
-    .catch(err => {
-      console.log(err)
-      res.status(404).end()
-    })
+    .catch(error => next(error))
 })
+
+//Error Handler
+const errorHandler = (error, req, res, next) => {
+  console.error(error.message)
+}
+app.use(errorHandler)
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
