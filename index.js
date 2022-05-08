@@ -103,7 +103,7 @@ app.post('/api/persons', (req, res, next) => {
 
 //Error Handler
 const errorHandler = (error, req, res, next) => {
-  console.error(error.message)
+  console.error('Error:', error.message)
 }
 app.use(errorHandler)
 
