@@ -86,7 +86,6 @@ app.post('/api/persons', (req, res, next) => {
   const person = {
     name: body.name,
     number: body.number
-
   }
 
   Person.create(person)
@@ -97,6 +96,26 @@ app.post('/api/persons', (req, res, next) => {
         res.status(404).end()
       }
 
+    })
+    .catch(error => next(error))
+})
+
+app.put('/api/persons/:id', (req, res, next) => {
+  const id = req.params.id
+  const body = req.body
+
+  const person = {
+    name: body.name,
+    number: body.number
+  }
+
+  Person.findByIdAndUpdate(id, person, {new: true})
+    .then(result => {
+      if(result) {
+        res.send(result)
+      } else {
+        res.status(404).end()
+      }
     })
     .catch(error => next(error))
 })
